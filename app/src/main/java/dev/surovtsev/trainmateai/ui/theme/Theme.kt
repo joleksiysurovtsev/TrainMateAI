@@ -115,6 +115,7 @@ data class ExtendedColorScheme(
     val customNavbar: Color,
     val customIcon: Color,
     val customText: Color,
+    val badgeTextColor: Color,
 )
 
 
@@ -139,6 +140,7 @@ fun TrainMateAITheme(
         customNavbar = if (darkTheme) Color(0xFF151414) else Color(0x99FFF8F0),
         customIcon = if (darkTheme) Color(0xFFFFFFFF).copy(alpha = 1f) else Color(0xFF050505).copy(alpha = 0.75f),
         customText = if (darkTheme) Color(0xFFFFFFFF).copy(alpha = 1f) else Color(0xFF050505).copy(alpha = 0.75f),
+        badgeTextColor = if (darkTheme) Color(0xFFFFFFFF).copy(alpha = 1f) else Color(0xFF050505).copy(alpha = 0.75f),
     )
 
     CompositionLocalProvider(

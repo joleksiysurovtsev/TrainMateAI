@@ -1,48 +1,56 @@
 package dev.surovtsev.trainmateai.feature.exercises
 
-/**
- * Иерархия категорий упражнений.
- * Все списки / карты создаём лениво через lazy {}, чтобы избежать
- * обращения к объектам, которые ещё не успели инициализироваться.
- */
-sealed class ExerciseCategory(val displayName: String) {
+import androidx.compose.ui.graphics.Color
 
-    /* ---- базовые ---- */
-    object Chest     : ExerciseCategory("Chest")
-    object Back      : ExerciseCategory("Back")
-    object Shoulders : ExerciseCategory("Shoulders")
-    object Core      : ExerciseCategory("Core")
-    object Cardio    : ExerciseCategory("Cardio")
-    object Other     : ExerciseCategory("Other")
+enum class ExerciseCategory(
+    val displayName: String,
+    val parent: ExerciseCategory? = null,
+    val defaultCollor: Color? = null
+) {
 
-    /* ---- Arms ---- */
-    sealed class Arms(displayName: String) : ExerciseCategory(displayName) {
-        object Biceps   : Arms("Biceps")
-        object Triceps  : Arms("Triceps")
-        object Forearms : Arms("Forearms")
-    }
+    /* ----- basic ----- */
+    Chest(displayName = "Chest", defaultCollor = Color(0xFFEF5350)),
+    Back(displayName = "Back", defaultCollor = Color(0xFF64C4FF)),
+    Arms(displayName = "Arms", defaultCollor = Color(0xFFFA6FFF)),
+    Legs(displayName = "Legs", defaultCollor = Color(0xFF26A69A)),
+    Core(displayName = "Core", defaultCollor = Color(0xFF66BB6A)),
+    Cardio(displayName = "Cardio", defaultCollor = Color(0xFFFF7043)),
+    All(displayName = "All", defaultCollor = Color(0xFF90A4AE)),
 
-    /* ---- Legs ---- */
-    sealed class Legs(displayName: String) : ExerciseCategory(displayName) {
-        object Quads      : Legs("Quads")
-        object Hamstrings : Legs("Hamstrings")
-        object Calves     : Legs("Calves")
-        object Glutes     : Legs("Glutes")
+
+    /* ----- Arms + sub-categories ----- */
+    Shoulders(displayName = "Shoulders", parent = Arms),
+    Biceps(displayName = "Biceps", parent = Arms),
+    Triceps(displayName = "Triceps", parent = Arms),
+    Forearms(displayName = "Forearms", parent = Arms),
+
+    /* ----- Legs + sub-categories ----- */
+
+    Quads(displayName = "Quads", parent = Legs),
+    Hamstrings(displayName = "Hamstrings", parent = Legs),
+    Calves(displayName = "Calves", parent = Legs),
+    Glutes(displayName = "Glutes", parent = Legs);
+
+    /* ---------- helpers ---------- */
+
+    /** Is the category "upper level". */
+    val isRoot: Boolean get() = parent == null
+
+    val color: Color get() = defaultCollor ?: parent!!.color
+
+    /** Daughter categories of current (we count lazily through values ()). */
+    val children: List<ExerciseCategory> by lazy {
+        ExerciseCategory.entries.filter { it.parent == this }
     }
 
     companion object {
-        /** Плоский список всех категорий (создаётся при первом обращении). */
-        val ALL: List<ExerciseCategory> by lazy {
-            listOf(
-                Chest, Back, Shoulders, Core, Cardio, Other,
-                Arms.Biceps, Arms.Triceps, Arms.Forearms,
-                Legs.Quads, Legs.Hamstrings, Legs.Calves, Legs.Glutes
-            )
-        }
 
-        /** Карта displayName → объект (ленивая, чтобы не ловить NPE). */
+        /** All root categories (Chest, Back, Arms, Legs ...). */
+        val ROOTS: List<ExerciseCategory> by lazy { ExerciseCategory.entries.filter { it.isRoot } }
+
+        /** Quick search on displayName - need Saver'u on screen. */
         val BY_NAME: Map<String, ExerciseCategory> by lazy {
-            ALL.associateBy { it.displayName }
+            ExerciseCategory.entries.associateBy { it.displayName }
         }
     }
 }

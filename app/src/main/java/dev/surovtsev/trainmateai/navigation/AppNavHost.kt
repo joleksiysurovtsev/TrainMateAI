@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import dev.surovtsev.trainmateai.feature.calendar.CalendarScreen
-import dev.surovtsev.trainmateai.feature.exercises.ExerciseScreen
+import dev.surovtsev.trainmateai.feature.exercises.screen.ExerciseScreen
 import dev.surovtsev.trainmateai.feature.statistic.StatisticScreen
 import dev.surovtsev.trainmateai.feature.tracker.TrackerScreen
 
