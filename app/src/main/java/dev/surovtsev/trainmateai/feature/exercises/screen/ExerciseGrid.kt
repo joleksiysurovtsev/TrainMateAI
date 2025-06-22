@@ -16,10 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import dev.surovtsev.trainmateai.feature.exercises.Exercise
+import dev.surovtsev.trainmateai.feature.exercises.domain.UiExerciseEntity
 
 @Composable
-fun ExerciseGrid(exercises: List<Exercise>) {
+fun ExerciseGrid(exerciseEntities: List<UiExerciseEntity>) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 160.dp),
         contentPadding = PaddingValues(16.dp),
@@ -27,21 +27,21 @@ fun ExerciseGrid(exercises: List<Exercise>) {
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier.Companion.fillMaxSize()
     ) {
-        items(exercises, key = { it.id }) { ExerciseTile(it) }
+        items(exerciseEntities, key = { it.id }) { ExerciseTile(it) }
     }
 }
 
 @Composable
-private fun ExerciseTile(exercise: Exercise) {
+private fun ExerciseTile(uiExerciseEntity: UiExerciseEntity) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape    = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(exercise.name,        style = MaterialTheme.typography.titleMedium)
-            Text(exercise.description, style = MaterialTheme.typography.bodyMedium)
+            Text(uiExerciseEntity.name,        style = MaterialTheme.typography.titleMedium)
+            Text(uiExerciseEntity.description, style = MaterialTheme.typography.bodyMedium)
             Text(
-                exercise.category.displayName,
+                uiExerciseEntity.category.displayName,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.secondary
             )

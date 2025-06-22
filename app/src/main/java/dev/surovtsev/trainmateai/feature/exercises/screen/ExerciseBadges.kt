@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.hazeChild
-import dev.surovtsev.trainmateai.feature.exercises.ExerciseCategory
+import dev.surovtsev.trainmateai.feature.exercises.domain.ExerciseCategory
 import dev.surovtsev.trainmateai.ui.theme.ExtendedTheme
 
 @Composable

@@ -13,7 +13,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import dev.surovtsev.trainmateai.feature.exercises.ExerciseCategory
+import dev.surovtsev.trainmateai.feature.exercises.domain.ExerciseCategory
 import dev.surovtsev.trainmateai.feature.exercises.ExerciseViewModel
 
 /* ---------- Saver ---------- */

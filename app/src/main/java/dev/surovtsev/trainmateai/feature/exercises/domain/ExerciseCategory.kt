@@ -1,4 +1,4 @@
-package dev.surovtsev.trainmateai.feature.exercises
+package dev.surovtsev.trainmateai.feature.exercises.domain
 
 import androidx.compose.ui.graphics.Color
 
