@@ -6,11 +6,11 @@ import androidx.room.TypeConverters
 import dev.surovtsev.trainmateai.feature.exercises.converter.CategoryConverter
 import dev.surovtsev.trainmateai.feature.exercises.converter.MediaKindConverter
 import dev.surovtsev.trainmateai.feature.exercises.dao.ExerciseDao
-import dev.surovtsev.trainmateai.feature.exercises.domain.UiExerciseEntity
+import dev.surovtsev.trainmateai.feature.exercises.domain.ExerciseEntity
 import dev.surovtsev.trainmateai.feature.exercises.domain.UiExerciseMediaEntity
 
 @Database(
-    entities = [UiExerciseEntity::class, UiExerciseMediaEntity::class],
+    entities = [ExerciseEntity::class, UiExerciseMediaEntity::class],
     version = 1,
     exportSchema = false
 )

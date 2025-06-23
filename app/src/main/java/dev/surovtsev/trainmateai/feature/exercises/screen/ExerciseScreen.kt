@@ -13,8 +13,9 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import dev.surovtsev.trainmateai.feature.exercises.domain.ExerciseCategory
+import androidx.hilt.navigation.compose.hiltViewModel
 import dev.surovtsev.trainmateai.feature.exercises.ExerciseViewModel
+import dev.surovtsev.trainmateai.feature.exercises.domain.ExerciseCategory
 
 /* ---------- Saver ---------- */
 private const val NONE = "__NONE__"
@@ -26,7 +27,7 @@ private val CategorySaver: Saver<ExerciseCategory?, String> = Saver(
 /* ---------- screen ---------- */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ExerciseScreen(viewModel: ExerciseViewModel = ExerciseViewModel()) {
+fun ExerciseScreen(viewModel: ExerciseViewModel = hiltViewModel() ) {
 
     val exercises by viewModel.exercises.collectAsState()
     var selected by rememberSaveable(stateSaver = CategorySaver) {

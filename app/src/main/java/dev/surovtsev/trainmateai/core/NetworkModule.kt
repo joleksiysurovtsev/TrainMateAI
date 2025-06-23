@@ -5,27 +5,43 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jakarta.inject.Singleton
+import dev.surovtsev.trainmateai.feature.exercises.dao.ExerciseDao
+import dev.surovtsev.trainmateai.feature.exercises.repository.ExerciseRepository
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val BASE_URL = "https://trainmateaidataprovider-production.up.railway.app/api/exercises"
+    private const val BASE_URL = "https://trainmateaidataprovider-production.up.railway.app/api/"
+
+    val contentType = "application/json".toMediaType()
+
+    val json = Json {
+        ignoreUnknownKeys = true       // лишние поля сервера — ОК
+        explicitNulls      = false     // не пишем null-ы
+    }
 
     @Provides
     @Singleton
     fun provideRetrofit(): Retrofit =
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .addConverterFactory(Json.Default.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(json.asConverterFactory(contentType))
             .build()
 
     @Provides
     @Singleton
     fun provideExerciseApi(retrofit: Retrofit): ExerciseApi =
         retrofit.create(ExerciseApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideExerciseRepository(
+        dao: ExerciseDao,
+        api: ExerciseApi
+    ): ExerciseRepository = ExerciseRepository(dao, api)
 }

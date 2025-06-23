@@ -1,42 +1,34 @@
+/* ────────── ExerciseViewModel.kt ────────── */
 package dev.surovtsev.trainmateai.feature.exercises
 
 import androidx.lifecycle.ViewModel
-import dev.surovtsev.trainmateai.feature.exercises.domain.ExerciseCategory
-import dev.surovtsev.trainmateai.feature.exercises.domain.UiExerciseEntity
-import kotlinx.coroutines.flow.MutableStateFlow
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.surovtsev.trainmateai.feature.exercises.domain.ExerciseEntity
+import dev.surovtsev.trainmateai.feature.exercises.repository.ExerciseRepository
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ExerciseViewModel : ViewModel() {
+@HiltViewModel
+class ExerciseViewModel @Inject constructor(
+    private val repository: ExerciseRepository
+) : ViewModel() {
 
-    // ---------------- state ----------------
-    private val _exercises = MutableStateFlow(sampleExercises())
-    val exercises: StateFlow<List<UiExerciseEntity>> = _exercises
-
-    // ---------------- demo-data ----------------
-    private fun sampleExercises(): List<UiExerciseEntity> = listOf(
-        UiExerciseEntity(
-            id = "1",
-            name = "Push-Up",
-            description = "Body-weight chest exercise",
-            category = ExerciseCategory.Chest,
-        ),
-        UiExerciseEntity(
-            id = "2",
-            name = "Back Squat",
-            description = "Legs and glutes builder",
-            category = ExerciseCategory.Quads
-        ),
-        UiExerciseEntity(
-            id = "3",
-            name = "Pull-Up",
-            description = "Back and biceps developer",
-            category = ExerciseCategory.Back
-        ),
-        UiExerciseEntity(
-            id = "4",
-            name = "Biceps Curl",
-            description = "Isolation for biceps",
-            category = ExerciseCategory.Biceps
+    /* ───── публичное состояние для UI ───── */
+    val exercises: StateFlow<List<ExerciseEntity>> =
+        repository.exercisesFlow.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
         )
-    )
+
+    init {
+        /* первый запуск – обновляем каталог */
+        viewModelScope.launch {
+            repository.refreshFromRemote()
+        }
+    }
 }

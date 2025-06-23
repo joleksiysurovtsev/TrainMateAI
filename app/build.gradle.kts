@@ -1,12 +1,12 @@
-
 @file:Suppress("DSL_SCOPE_VIOLATION")
-plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
 
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt.android)
+plugins {
+    id("com.android.application") version "8.10.1"
+    id("org.jetbrains.kotlin.android") version "2.1.21"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.1.21"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.1.21"
+    id("com.google.devtools.ksp") version "2.1.21-2.0.1"
+    id("com.google.dagger.hilt.android") version "2.56.2"
 }
 
 android {
@@ -19,7 +19,6 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -32,64 +31,87 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+
     kotlinOptions {
         jvmTarget = "21"
     }
+
     buildFeatures {
         compose = true
     }
 }
 
+configurations.configureEach {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "com.squareup" && requested.name == "javapoet") {
+            useVersion("1.13.0") // Фикс для canonicalName()
+        }
+    }
+}
+
 dependencies {
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.haze.jetpack.compose)
-    runtimeOnly(libs.androidx.material.icons.extended)
-    implementation(libs.coil.compose.base)
-    implementation(libs.androidx.animation)
+    // Compose + UI
+    val composeBom = platform("androidx.compose:compose-bom:2025.06.01")
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    implementation("androidx.compose.animation:animation:1.8.3")
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
+    implementation("androidx.navigation:navigation-compose:2.9.0")
+    implementation("androidx.activity:activity-compose:1.10.1")
+    implementation("dev.chrisbanes.haze:haze-jetpack-compose:0.7.0")
+    implementation("io.coil-kt:coil-compose-base:2.7.0")
 
-    /* ---------- ➊ Coroutines ---------- */
-    implementation(libs.kotlinx.coroutines.android)
+    // AndroidX Core
+    implementation("androidx.core:core-ktx:1.16.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.1")
 
-    /* ---------- ➋ Room ---------- */
-    implementation(libs.room.ktx)
-    implementation(libs.room.paging)
-    ksp(libs.room.compiler)
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
-    /* ---------- ➌ Paging 3 ---------- */
-    implementation(libs.paging.runtime)
-    implementation(libs.paging.compose)
+    // Room
+    implementation("androidx.room:room-ktx:2.7.2")
+    implementation("androidx.room:room-paging:2.7.2")
+    ksp("androidx.room:room-compiler:2.7.2")
 
-    /* ---------- ➍ DataStore ---------- */
-    implementation(libs.datastore.preferences)
+    // Paging
+    implementation("androidx.paging:paging-runtime-ktx:3.3.6")
+    implementation("androidx.paging:paging-compose:3.3.6")
 
-    /* --- Hilt --- */
-    implementation(libs.hilt.android)            // ⭐ runtime
-    ksp(libs.hilt.compiler)                      // ⭐ code-gen
-    implementation(libs.hilt.navigation.compose) // Nav-helper
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
 
-    /* --- API --- */
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.56.2")
+    ksp("com.google.dagger:hilt-compiler:2.56.2")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
+    // API & JSON
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
 
-    /* --- tests --- */
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    // JavaPoet нужен и compile-/ksp-конфигурациям
+    implementation("com.squareup:javapoet:1.13.0")
+    ksp("com.squareup:javapoet:1.13.0")
+
+    // Testing
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+}
+
+configurations.all {
+    resolutionStrategy.force("com.squareup:javapoet:1.13.0")
 }

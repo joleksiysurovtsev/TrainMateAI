@@ -6,7 +6,7 @@ import retrofit2.http.GET
 
 interface ExerciseApi {
 
-    @GET("exercises.json")              // → https://your.cdn.com/exercises.json
+    @GET("exercises")              // → https://your.cdn.com/exercises.json
     suspend fun fetchExercises(): List<ExerciseDto>
 
     @GET("exercise_media.json")
