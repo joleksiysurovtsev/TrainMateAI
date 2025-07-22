@@ -17,14 +17,8 @@ object RoomModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(
-        @ApplicationContext ctx: Context
-    ): AppDatabase =
-        Room.databaseBuilder(
-            ctx,
-            AppDatabase::class.java,
-            "trainmate.db"
-        ).build()
+    fun provideDatabase(@ApplicationContext ctx: Context): AppDatabase =
+        Room.databaseBuilder(ctx, AppDatabase::class.java, "trainmate.db").build()
 
     @Provides
     fun provideExerciseDao(db: AppDatabase): ExerciseDao = db.exerciseDao()

@@ -13,15 +13,11 @@ class ExerciseRepository @Inject constructor(
     private val dao: ExerciseDao,
     private val api: ExerciseApi
 ) {
-    /* Локальный поток данных */
+
     val exercisesFlow: Flow<List<Exercise>> = dao.observeAll()
 
-    /**
-     * Пробуем скачать каталог упражнений.
-     * Ошибки наружу, чтобы VM могла показать пользователю.
-     */
     suspend fun refreshFromRemote() {
-        val list = api.fetchExercises().map { it.toEntity() }
+        val list: List<Exercise> = api.fetchExercises().map { it.toEntity() }
         dao.insertAll(list)
     }
 }

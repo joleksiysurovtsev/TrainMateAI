@@ -14,9 +14,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun CalendarScreen() {
     Column(
-        modifier = Modifier.Companion
-            .fillMaxSize()
-            .padding(32.dp),
+        modifier = Modifier.Companion.fillMaxSize().padding(32.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.Companion.CenterHorizontally
     ) {

@@ -1,20 +1,20 @@
 package dev.surovtsev.trainmateai
 
-import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.HiltAndroidApp
 import dev.surovtsev.trainmateai.navigation.AppNavHost
 import dev.surovtsev.trainmateai.navigation.GlassBottomNavigationBar
+import dev.surovtsev.trainmateai.ui.theme.ExtendedTheme
 import dev.surovtsev.trainmateai.ui.theme.TrainMateAITheme
 
 @AndroidEntryPoint
@@ -27,15 +27,18 @@ class MainActivity : ComponentActivity() {
             TrainMateAITheme {
                 val navController = rememberNavController()
                 Scaffold(
-                    containerColor = MaterialTheme.colorScheme.background,
+                    containerColor = ExtendedTheme.colors.background,
                     bottomBar = {
-                        GlassBottomNavigationBar(navController = navController)
+                        GlassBottomNavigationBar(
+                            navController = navController
+                        )
                     }
                 ) { padding ->
                     AppNavHost(
                         navController = navController,
                         modifier = Modifier
                             .padding(padding)
+                            .background(Color.Transparent)
                             .fillMaxSize()
                     )
                 }
@@ -43,7 +46,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-@HiltAndroidApp          // ⭐ корневой компонент Hilt
-class TrainMateAiApp : Application()
 

@@ -30,7 +30,7 @@ val DarkColorScheme = darkColorScheme(
     tertiaryContainer = Color(0xFFCDDC39),
     onTertiaryContainer = Color(0xFF000000),
 
-    background = Color(0xFF121212),
+    background = Color(0xFF112531),
     onBackground = Color(0xFFE0E0E0),
 
     surface = Color(0xFF1E1E1E),
@@ -116,6 +116,7 @@ data class ExtendedColorScheme(
     val customIcon: Color,
     val customText: Color,
     val badgeTextColor: Color,
+    val background: Color,
 )
 
 
@@ -141,6 +142,7 @@ fun TrainMateAITheme(
         customIcon = if (darkTheme) Color(0xFFFFFFFF).copy(alpha = 1f) else Color(0xFF050505).copy(alpha = 0.75f),
         customText = if (darkTheme) Color(0xFFFFFFFF).copy(alpha = 1f) else Color(0xFF050505).copy(alpha = 0.75f),
         badgeTextColor = if (darkTheme) Color(0xFFFFFFFF).copy(alpha = 1f) else Color(0xFF050505).copy(alpha = 0.75f),
+        background = if (darkTheme) Color(0xFF202733).copy(alpha = 1f) else Color(0xFFFFFFFF).copy(alpha = 0.75f),
     )
 
     CompositionLocalProvider(

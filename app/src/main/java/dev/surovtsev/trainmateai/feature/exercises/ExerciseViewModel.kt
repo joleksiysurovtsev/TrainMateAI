@@ -19,11 +19,11 @@ class ExerciseViewModel @Inject constructor(
     private val repository: ExerciseRepository
 ) : ViewModel() {
 
-    /** Данные для списка */
+    /** Data for the list */
     val exercises: StateFlow<List<Exercise>> = repository.exercisesFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    /** Состояние кнопки/индикатора обновления */
+    /** The status of the update button/indicator */
     sealed interface RefreshState {
         object Idle     : RefreshState
         object Loading  : RefreshState
@@ -33,7 +33,7 @@ class ExerciseViewModel @Inject constructor(
     private val _refresh = MutableStateFlow<RefreshState>(RefreshState.Idle)
     val refresh: StateFlow<RefreshState> = _refresh.asStateFlow()
 
-    /** Вызываем из UI при нажатии на кнопку */
+    /** We call from the UI when pressing the button */
     fun onRefreshClick() {
         if (_refresh.value == RefreshState.Loading) return
         viewModelScope.launch {
@@ -43,7 +43,7 @@ class ExerciseViewModel @Inject constructor(
                 _refresh.value = RefreshState.Idle
             } catch (e: Exception) {
                 _refresh.value = RefreshState.Error(
-                    e.localizedMessage ?: "Не удалось загрузить данные"
+                    e.localizedMessage ?: "Failed to download data"
                 )
             }
         }

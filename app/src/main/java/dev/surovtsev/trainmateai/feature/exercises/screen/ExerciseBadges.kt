@@ -10,6 +10,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
@@ -43,69 +45,86 @@ import dev.chrisbanes.haze.hazeChild
 import dev.surovtsev.trainmateai.feature.exercises.domain.ExerciseCategory
 import dev.surovtsev.trainmateai.ui.theme.ExtendedTheme
 
-/* ---------- внешний API ---------- */
 @Composable
 fun ExerciseBadges(
     selected: ExerciseCategory?,
     onCategorySelected: (ExerciseCategory?) -> Unit,
     isRefreshing: Boolean,
     onRefreshClick: () -> Unit,
-    modifier: Modifier = Modifier
 ) {
-    val hazeState   = remember { HazeState() }
-    val badgeShape  = RoundedCornerShape(50)
-    val rootCategories = ExerciseCategory.ROOTS     // список корневых категорий
+
+    val hazeState: HazeState = remember { HazeState() }
+    val rootCategories: List<ExerciseCategory> = ExerciseCategory.ROOTS
+    val containerShape = RoundedCornerShape(
+        topStart = 0.dp, topEnd = 0.dp,
+        bottomStart = 28.dp, bottomEnd = 28.dp
+    )
 
     Row(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
+            /* ➊ — минимальная рамка (hairline) по контуру всей плашки */
+            .border(
+                width = Dp.Hairline,                      // ≈ 0.5 dp
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.35f),
+                shape = containerShape
+            )
+            /* ➋ — скругляем, чтобы и фон, и haze повторяли форму */
+            .clip(containerShape)
+            .background(ExtendedTheme.colors.customNavbar)
+            .hazeChild(
+                state = hazeState,
+                shape = containerShape,
+                style = HazeStyle(
+                    blurRadius = 60.dp,
+                    tint = Color.Black.copy(alpha = 0.25f),
+                    noiseFactor = 0.15f
+                )
+            )
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        /* ---------- FlowRow с категориями ---------- */
+        /* ---------- FlowRow with categories ---------- */
         FlowRow(
             modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Companion.CenterHorizontally),
-            verticalArrangement   = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(
+                space = 8.dp,
+                alignment = Alignment.Companion.CenterHorizontally
+            ),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             rootCategories.forEach { category ->
                 val isSel = category == selected
                 CategoryBadge(
-                    text       = category.displayName,
-                    baseColor  = category.color ?: MaterialTheme.colorScheme.primary,
-                    selected   = isSel,
-                    onClick    = {
+                    text = category.displayName,
+                    baseColor = category.color ?: MaterialTheme.colorScheme.primary,
+                    selected = isSel,
+                    onClick = {
                         onCategorySelected(
                             when {
                                 category == ExerciseCategory.All -> null
-                                isSel                            -> null
-                                else                             -> category
+                                isSel -> null
+                                else -> category
                             }
                         )
                     },
                     hazeState = hazeState,
-                    shape     = badgeShape
+                    shape = RoundedCornerShape(50)
                 )
             }
+            /* ---------- button Refresh ---------- */
+            RefreshBadge(
+                isRefreshing = isRefreshing,
+                onClick = onRefreshClick,
+                baseColor = MaterialTheme.colorScheme.primary,
+                hazeState = hazeState,
+                shape = RoundedCornerShape(50),
+                modifier = Modifier.padding(start = 8.dp)
+            )
         }
-
-        /* ---------- неоновая кнопка Refresh ---------- */
-        RefreshBadge(
-            isRefreshing  = isRefreshing,
-            onClick       = onRefreshClick,
-            baseColor     = MaterialTheme.colorScheme.primary,   // любой базовый оттенок
-            hazeState     = hazeState,
-            shape         = badgeShape,
-            modifier      = Modifier.padding(start = 8.dp)
-        )
     }
 }
 
-/* -------------------------------------------------------------------------- */
-/* ------------------------- Отдельные мини-компоненты ---------------------- */
-/* -------------------------------------------------------------------------- */
-
-/* 1. Обычный текстовый бейдж категории */
 @Composable
 private fun CategoryBadge(
     text: String,
@@ -119,22 +138,21 @@ private fun CategoryBadge(
     val glowScale by animateFloatAsState(if (selected) 1.35f else 1.05f)
 
     NeonContainer(
-        baseColor  = baseColor,
-        alpha      = glowAlpha,
-        scale      = glowScale,
-        hazeState  = hazeState,
-        shape      = shape,
-        onClick    = onClick
+        baseColor = baseColor,
+        alpha = glowAlpha,
+        scale = glowScale,
+        hazeState = hazeState,
+        shape = shape,
+        onClick = onClick
     ) {
         Text(
-            text  = text,
+            text = text,
             color = ExtendedTheme.colors.badgeTextColor,
             style = MaterialTheme.typography.labelLarge
         )
     }
 }
 
-/* 2. Иконка Refresh с вращением во время загрузки */
 @Composable
 private fun RefreshBadge(
     isRefreshing: Boolean,
@@ -147,7 +165,7 @@ private fun RefreshBadge(
     val infinite = rememberInfiniteTransition(label = "spin")
     val angle by infinite.animateFloat(
         initialValue = 0f,
-        targetValue  = 360f,
+        targetValue = 360f,
         animationSpec = infiniteRepeatable(
             tween(800, easing = LinearEasing),
             RepeatMode.Restart
@@ -156,17 +174,17 @@ private fun RefreshBadge(
 
     NeonContainer(
         baseColor = baseColor,
-        alpha     = 0.6f,
-        scale     = 1.1f,
+        alpha = 0.6f,
+        scale = 1.1f,
         hazeState = hazeState,
-        shape     = shape,
-        onClick   = { if (!isRefreshing) onClick() },
-        modifier  = modifier
+        shape = shape,
+        onClick = { if (!isRefreshing) onClick() },
+        modifier = modifier
     ) {
         Icon(
-            imageVector        = Icons.Filled.Refresh,
-            contentDescription = "Обновить",
-            tint   = ExtendedTheme.colors.badgeTextColor,
+            imageVector = Icons.Filled.Refresh,
+            contentDescription = "update",
+            tint = ExtendedTheme.colors.badgeTextColor,
             modifier = Modifier
                 .size(20.dp)
                 .graphicsLayer { rotationZ = if (isRefreshing) angle else 0f }
@@ -174,7 +192,6 @@ private fun RefreshBadge(
     }
 }
 
-/* 3. Общий «стеклянный неоновый» контейнер */
 @Composable
 private fun NeonContainer(
     baseColor: Color,
@@ -198,7 +215,7 @@ private fun NeonContainer(
         ) {
             val radius = size.minDimension / 2 * scale
             drawCircle(
-                color  = baseColor.copy(alpha = alpha),
+                color = baseColor.copy(alpha = alpha),
                 radius = radius,
                 center = center
             )
@@ -214,7 +231,7 @@ private fun NeonContainer(
                     shape = shape,
                     style = HazeStyle(
                         blurRadius = 60.dp,
-                        tint       = Color.Black.copy(alpha = 0.25f),
+                        tint = Color.Black.copy(alpha = 0.25f),
                         noiseFactor = 0.15f
                     )
                 )
